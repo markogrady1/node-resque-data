@@ -1,9 +1,8 @@
 {
-  "name": "queue-up",
+  "name": "@mytest/queue-up",
   "version": "1.0.0",
   "description": "queueing system for NodeJS",
-  "main": "index.js",
-  "type": "module",
+  "main": "src/index.js",
   "scripts": {
     "dev": "node src/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -15,6 +14,7 @@
   "author": "Mark O Grady",
   "license": "ISC",
   "dependencies": {
-    "ioredis": "^4.27.5"
+    "express": "^4.17.1",
+    "ioredis": "^4.27.6"
   }
 }
