@@ -8,7 +8,7 @@ window.onload = function() {
   }
   console.log(url)
   console.log(options)
-  <% swaggerOptions %>
+  <% options %>
   url = options.swaggerUrl || url
   var urls = options.swaggerUrls
   var customOptions = options.customOptions

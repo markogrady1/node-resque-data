@@ -85,8 +85,8 @@
 <div id="queue-ui"></div>
 
 <!--<script src="./swagger-ui-bundle.js"> </script>
-<script src="./swagger-ui-standalone-preset.js"> </script>
-<script src="./swagger-ui-init.js"> </script>-->
+<script src="./swagger-ui-standalone-preset.js"> </script>-->
+<script src="./queue-ui-init.js"> </script>
 
 <style>
 

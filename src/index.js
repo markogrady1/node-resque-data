@@ -15,11 +15,14 @@ let generateHTML =  function (config, opts) {
     } catch (e) {
 
     }
-  var htmlWithCustomCss = html.toString().replace('<% customCss %>', '');
+  const htmlWithCustomCss = html.toString().replace('<% customCss %>', '');
 
   var js = fs.readFileSync(__dirname + '/queue-ui-init.js.tpl');
-  queueInit = js.toString().replace('<% swaggerOptions %>', '')
-  return htmlWithCustomCss;
+  const testOptions = {
+    test: 'foobar'
+  }
+  queueInit = js.toString().replace('<% options %>', stringify(testOptions))
+  return htmlWithCustomCss.replace('<% title %>', 'Queue UI')
 }
 
 
@@ -36,8 +39,8 @@ let setup = function (config, opts) {
   };
 }
 
-var assetMiddleware = options => {
-  var opts = options || {}
+const assetMiddleware = options => {
+  const opts = options || {}
   opts.index = false
 
   return express.static(getAbsoluteFSPath(), opts)
@@ -64,18 +67,18 @@ function initFn (req, res, next) {
 }
 
 
-var stringify = function (obj, prop) {
-  var placeholder = '____FUNCTIONPLACEHOLDER____';
-  var fns = [];
-  var json = JSON.stringify(obj, function (key, value) {
+const stringify = function (obj, prop) {
+  const placeholder = '____CONTENTPLACEHOLDER____';
+  let arr = [];
+  let json = JSON.stringify(obj, function (key, value) {
     if (typeof value === 'function') {
-      fns.push(value);
+      arr.push(value);
       return placeholder;
     }
     return value;
   }, 2);
   json = json.replace(new RegExp('"' + placeholder + '"', 'g'), function (_) {
-    return fns.shift();
+    return arr.shift();
   });
   return 'var options = ' + json + ';';
 };
