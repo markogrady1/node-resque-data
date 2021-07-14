@@ -12,8 +12,6 @@ new Redis({
   db: 0,
 });
 
-
-
 */
 module.exports = class Queue {
   constructor (config = undefined) {
@@ -30,19 +28,6 @@ module.exports = class Queue {
         num: length
       });
     }
-
-          console.log(this.namespace);
-
-
     fn(queueLen);
-    // const keyPart = 'textkernelsearch-resque:queue';
-    // const hubIndexQueue = await this.redis.llen(`${keyPart}:hubIndex`);
-    // const candidateIndexQueue = await this.redis.llen(`${keyPart}:candidateIndex`);
-    // const delayedDeletionQueue = await this.redis.llen(`${keyPart}:delayedCandidateDelete`);
-
-    // console.log(this.namespace)
-    // console.log(hubIndexQueue)
-    // console.log(candidateIndexQueue)
-    // console.log(delayedDeletionQueue)
   }
 }
