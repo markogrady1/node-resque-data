@@ -31,7 +31,6 @@
 <body>
 
 <div class="queue-table"></div>
-<div class="queue-table2"></div>
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
 <script src="./ajax-req.js"> </script>
 <script src="./queue-ui-init.js"> </script>
