@@ -23,12 +23,12 @@ window.onload = function() {
   {
 
     <% dataObj %>
-    /* THIS IS TEST DATA */
+      /* THIS IS TEST DATA */
 
-    dataObj[0].num = 0
+      dataObj[0].num = 7000
     dataObj[1].num = 23
-    dataObj[2].num = 1
-    dataObj[3].num = 0
+    dataObj[2].num = 2
+    dataObj[3].num = 1
 
     // dataObj.push({
     //    queue: 'foo',
@@ -56,13 +56,13 @@ window.onload = function() {
     //
   }
 
-  const width = 1500;
-  const height = 750;
+  const width = 1550;
+  const height = 800;
   const margin = {
-    top: 50,
-    bottom: 200,
-    left: 50,
-    right: 50
+    top: 100,
+    bottom: 250,
+    left: 100,
+    right: 100
   };
 
   const svg = d3.select('div.queue-table')
@@ -82,7 +82,7 @@ window.onload = function() {
     })])
     .range([height - margin.bottom, margin.top])
 
-  svg
+  let rect = svg
     .append("g")
     .attr("fill", 'royalblue')
     .selectAll("rect")
@@ -95,13 +95,54 @@ window.onload = function() {
     .attr("class", "rect")
     .attr("height", d => y(0) - y(d.num))
     .attr("width", x.bandwidth())
+    .on('mouseover', function(d, i) {
+      console.log(i)
+      tooltip
+        .html(
+          `<div>Queue: ${i.queue}</div><div>Jobs: ${i.num}</div>`
+        )
+        .style('visibility', 'visible');
+      d3.select(this).transition().attr('fill', 'black');
+    })
+    .on('mousemove', function(d, i) {
+      console.log(d.screenX)
+      tooltip
+        .style('top', d.screenY - 100 + 'px')
+        .style('left', d.screenX - 10 + 'px');
+    })
+    .on('mouseout', function() {
+      tooltip.html(``).style('visibility', 'hidden');
+      d3.select(this).transition().attr('fill', 'steelblue');
+    });
+
+
+  // rect
+  //     .transition()
+  //     .ease(d3.easeLinear)
+  //     .duration(800)
+  //     .attr('y', d => y(d.num))
+  //     .attr('height', d => height /2- y(d.num) + 450)
+  //     .delay((d, i) => i * 100);
+
+  tooltip = d3
+    .select('div.queue-table')
+    .append('div')
+    .attr('class', 'd3-tooltip')
+    .style('position', 'absolute')
+    .style('z-index', '10')
+    .style('visibility', 'hidden')
+    .style('padding', '10px')
+    .style('background', 'rgba(0,0,0,0.6)')
+    .style('border-radius', '4px')
+    .style('color', '#fff')
+    .text('a simple tooltip');
+
 
   svg.selectAll('.bar-label')
     .data(dataObj)
     .enter()
     .append('text')
     .classed('bar-label', true)
-
 
     .attr('x', function(d, i) {
       return x(i) + x.bandwidth() / 3;
@@ -123,6 +164,42 @@ window.onload = function() {
       return d;
     }))
     .attr("font-size", '20px')
+
+
+
+  svg.append('g')
+    .classed('x axis', true)
+    .attr('transform', 'translate(' + 0 + ',' + height + ')')
+
+    .selectAll('text')
+    .style('text-anchor', 'end')
+    .attr('dx', -8)
+    .attr('dy', 8)
+    .attr('transform', 'translate(0,0) rotate(-45)');
+  svg.append('g')
+    .classed('y axis', true)
+    .attr('transform', 'translate(0,0)')
+
+  svg.select('.y.axis')
+    .append('text')
+    .attr('x', 0)
+    .attr('y', 0)
+    .style('text-anchor', 'middle')
+    .style('font-size', '30px')
+    .attr('transform', 'translate(-10, ' + height / 2 + ') rotate(-90)')
+    .text('No. of Jobs');
+
+  svg.select('.x.axis')
+    .append('text')
+    .attr('x', 0)
+    .attr('y', 0)
+    .classed('x-axis-title', true)
+    .style('text-anchor', 'middle')
+    .style('font-size', '30px')
+    .attr('transform', 'translate(' + width / 2 + ', -10)')
+    .text("Queues");
+
+
 
   svg.append('g')
     .attr("transform", `translate(0,${height - margin.bottom})`) // This controls the rotate position of the Axis
