@@ -36,7 +36,16 @@ let htmlTplStr = `
 
     .container {
       width: 80%;
-      margin: 0 auto;
+      margin: 100 auto 0 auto;
+    }
+
+    .header {
+      position: sticky;
+      top: 1px;
+      width: 100%;
+      height: 70px;
+      color: #fff;
+      background-color: #000;
     }
 .wrapper{
 width:100%;
@@ -53,6 +62,7 @@ background-color: #1b1b1b;
 
 <body>
 
+<header class="header">TEST HEADER</header>
 <div class="container">
 <div class='top-panel'>
   <div id="queue-list"></div>
