@@ -14,7 +14,7 @@ let generateHTML = function(config, opts, _htmlTplString, _jsTplString, customCs
     config.namespace = config.namespace || 'resque'
   }
 
-  let pageHeader = 'Node Resque Data';
+  let pageHeader = 'Node Resque UI';
   if (opts && typeof opts === 'object') {
     pageHeader = opts.customHeader || pageHeader;
   }
