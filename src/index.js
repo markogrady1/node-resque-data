@@ -4,7 +4,7 @@ const express = require('express');
 let queueInit;
 let namespace;
 
-let generateHTML = function(config, opts, _htmlTplString, _jsTplString, customCss, customJs) {
+let generate = function(config, opts, _htmlTplString, _jsTplString, customCss, customJs) {
 
   const customCssStr = customCss ? customCss : '';
   const customJsStr = customJs ? customJs : '';
@@ -15,8 +15,16 @@ let generateHTML = function(config, opts, _htmlTplString, _jsTplString, customCs
   }
 
   let pageHeader = 'Node Resque UI';
+  let pageTitle = 'Node Resque UI';
+  let rawJSON = false;
   if (opts && typeof opts === 'object') {
+    rawJSON = opts.rawJSON || rawJSON;
     pageHeader = opts.customHeader || pageHeader;
+    pageTitle = opts.customTitle || pageTitle;
+  }
+
+  if (rawJSON) {
+    return true;
   }
 
   _htmlTplString = _htmlTplString || htmlTplStr
@@ -26,20 +34,29 @@ let generateHTML = function(config, opts, _htmlTplString, _jsTplString, customCs
   _htmlTplString = _htmlTplString.toString().replace('<% customCss %>', customCssStr);
   _htmlTplString = _htmlTplString.toString().replace('<% customJs %>', customJsStr);
   const htmlWithCustomCss = _htmlTplString.toString().replace('<% customHeader %>', pageHeader);
-  return htmlWithCustomCss.replace('<% title %>', 'Queue UI')
+  return htmlWithCustomCss.replace('<% title %>', pageTitle)
 }
 
 let setup = function(config, opts, customCss, customJs) {
 
   return function(req, res) {
     config.uiUrl = req.originalUrl
-    const html = generateHTML(config, opts, htmlTplStr, jsTplStr)
+    const html = generate(config, opts, htmlTplStr, jsTplStr, customCss, customJs);
+
+    let displayRaw = false;
+    if (html && typeof html === 'boolean' && typeof html !== 'string') {
+      displayRaw = true;
+    }
     const queue = new Queue(config);
     const testOptions = {
       uiUrl: config.uiUrl,
     }
     queueInit = jsTplStr.toString().replace('<% options %>', stringify(testOptions))
     queue.queue(config.queues, (data) => {
+      if (displayRaw) {
+        res.set('Content-Type', 'application/json')
+        return res.send(data)
+      }
       queueInit = queueInit.toString().replace('<% dataObj %>', stringify(data, true))
       res.send(html)
     })
@@ -47,7 +64,7 @@ let setup = function(config, opts, customCss, customJs) {
 }
 
 const assetMiddleware = options => {
-  const opts = options || {}
+  const opts = options || {};
   opts.index = false
 
   return express.static(getAbsoluteFSPath(), opts)
@@ -176,10 +193,9 @@ let htmlTplStr = `
 
 
 let jsTplStr = `
-window.onload = function() {
+window.onload = data => {
   // Build a system
   let url = window.location.search.match(/url=([^&]+)/);
-
 
   if (url && url.length > 1) {
     url = decodeURIComponent(url[1]);
