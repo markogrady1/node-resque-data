@@ -4,7 +4,92 @@ const express = require('express');
 let queueInit;
 let namespace;
 
+let generateHTML = function(config, opts, _htmlTplString, _jsTplString, customCss, customJs) {
 
+  const customCssStr = customCss ? customCss : '';
+  const customJsStr = customJs ? customJs : '';
+
+
+  if (config && typeof config === 'object') {
+    config.namespace = config.namespace || 'resque'
+  }
+
+  let pageHeader = 'Node Resque Data';
+  if (opts && typeof opts === 'object') {
+    pageHeader = opts.customHeader || pageHeader;
+  }
+
+  _htmlTplString = _htmlTplString || htmlTplStr
+  _jsTplString = _jsTplString || jsTplString
+
+
+  _htmlTplString = _htmlTplString.toString().replace('<% customCss %>', customCssStr);
+  _htmlTplString = _htmlTplString.toString().replace('<% customJs %>', customJsStr);
+  const htmlWithCustomCss = _htmlTplString.toString().replace('<% customHeader %>', pageHeader);
+  return htmlWithCustomCss.replace('<% title %>', 'Queue UI')
+}
+
+let setup = function(config, opts, customCss, customJs) {
+
+  return function(req, res) {
+    config.uiUrl = req.originalUrl
+    const html = generateHTML(config, opts, htmlTplStr, jsTplStr)
+    const queue = new Queue(config);
+    const testOptions = {
+      uiUrl: config.uiUrl,
+    }
+    queueInit = jsTplStr.toString().replace('<% options %>', stringify(testOptions))
+    queue.queue(config.queues, (data) => {
+      queueInit = queueInit.toString().replace('<% dataObj %>', stringify(data, true))
+      res.send(html)
+    })
+  };
+}
+
+const assetMiddleware = options => {
+  const opts = options || {}
+  opts.index = false
+
+  return express.static(getAbsoluteFSPath(), opts)
+}
+
+const getAbsoluteFSPath = function() {
+  // detect whether we are running in a browser or nodejs
+  if (typeof module !== "undefined" && module.exports) {
+    return require("path").resolve(__dirname)
+  }
+  throw new Error('getAbsoluteFSPath can only be called within a Nodejs environment');
+}
+
+const serve = [initFn, assetMiddleware()];
+
+function initFn(req, res, next) {
+  if (req.url === '/queue-ui-init.js') {
+    res.set('Content-Type', 'application/javascript')
+    res.send(queueInit)
+  } else {
+    next()
+  }
+}
+
+const stringify = function(obj, isData) {
+  const placeholder = '____CONTENTPLACEHOLDER____';
+  let arr = [];
+  let json = JSON.stringify(obj, function(key, value) {
+    if (typeof value === 'function') {
+      arr.push(value);
+      return placeholder;
+    }
+    return value;
+  }, 2);
+  json = json.replace(new RegExp('"' + placeholder + '"', 'g'), function(_) {
+    return arr.shift();
+  });
+  if (isData) {
+    return 'var dataObj = ' + json + ';';
+  }
+  return 'var options = ' + json + ';';
+};
 
 let htmlTplStr = `
 <!-- HTML for static distribution bundle build -->
@@ -30,49 +115,61 @@ let htmlTplStr = `
     }
 
     body {
+      font-family: -apple-system, blinkmacsystemfont, "Segoe UI", roboto, "Noto Sans", oxygen, ubuntu, cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
       margin:0;
       background: #fafafa;
     }
 
     .container {
-      width: 80%;
+      width: 60%;
       margin: 100 auto 0 auto;
     }
+
+     .queue-table {
+       width: 80%;
+       margin: 0 auto;
+     }
+
+     div#queue-list {
+       padding: 20px 0px 0px 100px;
+       width:50%;
+       margin:0 auto;
+     }
+
+     #queue-dohnut {
+       width: 30%;
+       margin: 0 auto;
+     }
 
     .header {
       position: sticky;
       top: 1px;
       width: 100%;
-      height: 70px;
+      height: 50px;
       color: #fff;
+      padding: 15px;
       background-color: #000;
     }
-.wrapper{
-width:100%;
-max-width:1460px;
-margin:0 auto;
-padding:0 20px;
--webkit-box-sizing:border-box;
-box-sizing:border-box
-background-color: #1b1b1b;
-    padding: 10px 0;
-}
+
+  </style>
+  <style>
+    <% customCss %>
   </style>
 </head>
 
 <body>
 
-<header class="header">TEST HEADER</header>
+<header class="header"><% customHeader %></header>
 <div class="container">
-<div class='top-panel'>
   <div id="queue-list"></div>
   <div class="queue-table"></div>
-<div>
-  <div class="queue-pie"></div>
-  <div id="queue-dohnut"></div>
+   <div id="queue-dohnut"></div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
 <script src="./queue-ui-init.js"> </script>
+<script>
+  <% customJs %>
+</script>
 </body>
 </html>
 `
@@ -115,30 +212,30 @@ window.onload = function() {
     dataObj[2].num = 2
     dataObj[3].num = 1
 
-    // dataObj.push({
-    //    queue: 'foo',
-    //    num: 1230
+    //dataObj.push({
+    //   queue: 'foo',
+    //   num: 1230
+    //},{
+    //  queue: 'foo1',
+    //  num: 123
+    //},{
+    //  queue: 'foo2',
+    //  num: 235
+    //},{
+    //  queue: 'foo3',
+    //  num: 6342
     // },{
-    //   queue: 'foo1',
-    //   num: 123
+    //   queue: 'foo4',
+    //   num: 6243
     // },{
-    //   queue: 'foo2',
-    //   num: 235
-    // },{
-    //   queue: 'foo3',
-    //   num: 6342
+    //   queue: 'foo5',
+    //   num: 563
     //  },{
-    //    queue: 'foo4',
-    //    num: 6243
-    //  },{
-    //    queue: 'foo5',
-    //    num: 563
-    //   },{
-    //     queue: 'foo6',
-    //     num: 23
-    // }
-    // )
-    //
+    //    queue: 'foo6',
+    //    num: 23
+    //}
+    //)
+
   } {
     const width = 1550;
     const height = 800;
@@ -278,7 +375,7 @@ window.onload = function() {
     listEl.appendChild(node);
     for (let item in dataObj) {
       const li = document.createElement('li');
-      const queueName = document.createTextNode(dataObj[item].queue);
+      const queueName = document.createTextNode(dataObj[item].queue + ': ' + dataObj[item].num);
       li.appendChild(queueName)
       node.appendChild(li)
 
@@ -314,7 +411,6 @@ window.onload = function() {
     // Compute the position of each group on the pie:
     const pie = d3.pie()
       .value(function(d) {
-        console.log(d)
         return d.num;
       })
 
@@ -329,7 +425,6 @@ window.onload = function() {
         .outerRadius(radius)
       )
       .attr('fill', function(d) {
-        console.log(d)
         return (color(d.data.queue))
       })
       .attr('class', 'label')
@@ -373,85 +468,6 @@ window.onload = function() {
 }
 
 `
-
-let generateHTML = function(config, opts, _htmlTplString, _jsTplString) {
-
-  if (config && typeof config === 'object') {
-    config.namespace = config.namespace || 'resque'
-  }
-
-  _htmlTplString = _htmlTplString || htmlTplStr
-  _jsTplString = _jsTplString || jsTplString
-
-
-  const htmlWithCustomCss = _htmlTplString.toString().replace('<% customCss %>', '');
-  return htmlWithCustomCss.replace('<% title %>', 'Queue UI')
-}
-
-
-let setup = function(config, opts) {
-
-
-  return function(req, res) {
-    config.uiUrl = req.originalUrl
-    const html = generateHTML(config, opts, htmlTplStr, jsTplStr)
-    const queue = new Queue(config);
-    // var js = fs.readFileSync(__dirname + '/queue-ui-init.js.tpl');
-    const testOptions = {
-      uiUrl: config.uiUrl,
-    }
-    queueInit = jsTplStr.toString().replace('<% options %>', stringify(testOptions))
-    queue.queue(config.queues, (data) => {
-      queueInit = queueInit.toString().replace('<% dataObj %>', stringify(data, true))
-      res.send(html)
-    })
-  };
-}
-
-const assetMiddleware = options => {
-  const opts = options || {}
-  opts.index = false
-
-  return express.static(getAbsoluteFSPath(), opts)
-}
-
-const getAbsoluteFSPath = function() {
-  // detect whether we are running in a browser or nodejs
-  if (typeof module !== "undefined" && module.exports) {
-    return require("path").resolve(__dirname)
-  }
-  throw new Error('getAbsoluteFSPath can only be called within a Nodejs environment');
-}
-
-const serve = [initFn, assetMiddleware()];
-
-function initFn(req, res, next) {
-  if (req.url === '/queue-ui-init.js') {
-    res.set('Content-Type', 'application/javascript')
-    res.send(queueInit)
-  } else {
-    next()
-  }
-}
-
-const stringify = function(obj, isData) {
-  const placeholder = '____CONTENTPLACEHOLDER____';
-  let arr = [];
-  let json = JSON.stringify(obj, function(key, value) {
-    if (typeof value === 'function') {
-      arr.push(value);
-      return placeholder;
-    }
-    return value;
-  }, 2);
-  json = json.replace(new RegExp('"' + placeholder + '"', 'g'), function(_) {
-    return arr.shift();
-  });
-  if (isData) {
-    return 'var dataObj = ' + json + ';';
-  }
-  return 'var options = ' + json + ';';
-};
 
 module.exports = {
   setup: setup,
