@@ -3,7 +3,13 @@
 
 this package is to be used in conjunction with node-resque being used with express.
 
-Usage:
+####Installation
+
+```
+npm install node-resque-express-ui
+```
+
+####Usage:
 
 
 ```
