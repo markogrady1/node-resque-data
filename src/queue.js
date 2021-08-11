@@ -19,7 +19,16 @@ module.exports = class Queue {
     this.redis = new Redis(config);
   }
 
-  async queue(queues, fn) {
+  async queueForUI(queues, fn) {
+    this._getQueueLengths(queues, fn);
+  }
+
+  async queueStats(queues) {
+    const queueData = await this._getQueueLengths(queues);
+    return queueData;
+  }
+
+  async _getQueueLengths(queues, fn = undefined) {
     let queueLen = [];
     for (const index in queues) {
       const length = await this.redis.llen(`${this.namespace}:queue:${queues[index]}`);
@@ -28,6 +37,10 @@ module.exports = class Queue {
         num: length
       });
     }
+    if (!fn) {
+      return queueLen;
+    }
+
     fn(queueLen);
   }
 }

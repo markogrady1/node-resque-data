@@ -9,7 +9,6 @@ let generate = function(config, opts, _htmlTplString, _jsTplString, customCss, c
   const customCssStr = customCss ? customCss : '';
   const customJsStr = customJs ? customJs : '';
 
-
   if (config && typeof config === 'object') {
     config.namespace = config.namespace || 'resque'
   }
@@ -52,7 +51,7 @@ let setup = function(config, opts, customCss, customJs) {
       uiUrl: config.uiUrl,
     }
     queueInit = jsTplStr.toString().replace('<% options %>', stringify(testOptions))
-    queue.queue(config.queues, (data) => {
+    queue.queueForUI(config.queues, (data) => {
       if (displayRaw) {
         res.set('Content-Type', 'application/json')
         return res.send(data)
@@ -107,6 +106,17 @@ const stringify = function(obj, isData) {
   }
   return 'var options = ' + json + ';';
 };
+
+let queueData =  async function(config) {
+  if (config && typeof config === 'object' && Array.isArray(config.queues)) {
+    const queue = new Queue(config);
+    const results =  await queue.queueStats(config.queues);
+
+    return results;
+  }
+
+  throw new Error("the 'queues' field cannot be missing or undefined");
+}
 
 let htmlTplStr = `
 <!-- HTML for static distribution bundle build -->
@@ -482,10 +492,12 @@ window.onload = data => {
       .text('a simple tooltip');
   }
 }
-
 `
+
+
 
 module.exports = {
   setup: setup,
   serve: serve,
+  queueData: queueData,
 }
