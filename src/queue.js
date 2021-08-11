@@ -1,7 +1,6 @@
 // import Job from './Job.js';
 const Redis = require('ioredis');
 
-
 /*
 
 new Redis({
@@ -14,8 +13,8 @@ new Redis({
 
 */
 module.exports = class Queue {
-  constructor (config = undefined) {
-    this.namespace = config.namespace || 'resque'
+  constructor(config = undefined) {
+    this.namespace = config.namespace || 'resque';
     this.redis = new Redis(config);
   }
 
@@ -43,4 +42,4 @@ module.exports = class Queue {
 
     fn(queueLen);
   }
-}
+};

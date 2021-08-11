@@ -5,7 +5,9 @@
   "main": "src/index.js",
   "scripts": {
     "dev": "node src/index.js",
-    "test": "jest"
+    "test": "jest",
+    "lint": "eslint \"src/**/*.js\" \"src/*.js\"",
+    "lint:fix": "npm run lint -- --fix"
   },
   "keywords": [
     "queue",
@@ -18,6 +20,12 @@
     "ioredis": "^4.27.6"
   },
   "devDependencies": {
+    "eslint": "^7.32.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-import": "^2.23.4",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-prettier": "^3.4.0",
+    "eslint-plugin-promise": "^5.1.0",
     "ioredis-mock": "^5.6.0",
     "jest": "^27.0.6"
   }

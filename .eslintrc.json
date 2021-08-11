@@ -1,0 +1,20 @@
+{
+    "root": true,
+    "env": {
+        "commonjs": true,
+        "es2021": true,
+        "node": true
+    },
+    "extends": [
+        "eslint:recommended",
+        "prettier"
+    ],
+    "plugins": ["import", "prettier"],
+    "parserOptions": {
+        "ecmaVersion": 12
+    },
+    "rules": {
+        "prettier/prettier": "error",
+        "semi": ["error", "always"]
+    }
+}

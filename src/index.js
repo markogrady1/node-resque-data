@@ -2,15 +2,13 @@ const Queue = require('./queue.js');
 const express = require('express');
 
 let queueInit;
-let namespace;
 
-let generate = function(config, opts, _htmlTplString, _jsTplString, customCss, customJs) {
-
+let generate = function (config, opts, _htmlTplString, _jsTplString, customCss, customJs) {
   const customCssStr = customCss ? customCss : '';
   const customJsStr = customJs ? customJs : '';
 
   if (config && typeof config === 'object') {
-    config.namespace = config.namespace || 'resque'
+    config.namespace = config.namespace || 'resque';
   }
 
   let pageHeader = 'Node Resque UI';
@@ -26,20 +24,18 @@ let generate = function(config, opts, _htmlTplString, _jsTplString, customCss, c
     return true;
   }
 
-  _htmlTplString = _htmlTplString || htmlTplStr
-  _jsTplString = _jsTplString || jsTplString
-
+  _htmlTplString = _htmlTplString || htmlTplStr;
+  //_jsTplString = _jsTplString || jsTplString;
 
   _htmlTplString = _htmlTplString.toString().replace('<% customCss %>', customCssStr);
   _htmlTplString = _htmlTplString.toString().replace('<% customJs %>', customJsStr);
   const htmlWithCustomCss = _htmlTplString.toString().replace('<% customHeader %>', pageHeader);
-  return htmlWithCustomCss.replace('<% title %>', pageTitle)
-}
+  return htmlWithCustomCss.replace('<% title %>', pageTitle);
+};
 
-let setup = function(config, opts, customCss, customJs) {
-
-  return function(req, res) {
-    config.uiUrl = req.originalUrl
+let setup = function (config, opts, customCss, customJs) {
+  return function (req, res) {
+    config.uiUrl = req.originalUrl;
     const html = generate(config, opts, htmlTplStr, jsTplStr, customCss, customJs);
 
     let displayRaw = false;
@@ -48,57 +44,62 @@ let setup = function(config, opts, customCss, customJs) {
     }
     const queue = new Queue(config);
     const testOptions = {
-      uiUrl: config.uiUrl,
-    }
-    queueInit = jsTplStr.toString().replace('<% options %>', stringify(testOptions))
-    queue.queueForUI(config.queues, (data) => {
+      uiUrl: config.uiUrl
+    };
+    queueInit = jsTplStr.toString().replace('<% options %>', stringify(testOptions));
+    queue.queueForUI(config.queues, data => {
       if (displayRaw) {
-        res.set('Content-Type', 'application/json')
-        return res.send(data)
+        res.set('Content-Type', 'application/json');
+        return res.send(data);
       }
-      queueInit = queueInit.toString().replace('<% dataObj %>', stringify(data, true))
-      res.send(html)
-    })
+      queueInit = queueInit.toString().replace('<% dataObj %>', stringify(data, true));
+      res.send(html);
+    });
   };
-}
+};
 
 const assetMiddleware = options => {
   const opts = options || {};
-  opts.index = false
+  opts.index = false;
 
-  return express.static(getAbsoluteFSPath(), opts)
-}
+  return express.static(getAbsoluteFSPath(), opts);
+};
 
-const getAbsoluteFSPath = function() {
+const getAbsoluteFSPath = function () {
   // detect whether we are running in a browser or nodejs
-  if (typeof module !== "undefined" && module.exports) {
-    return require("path").resolve(__dirname)
+  if (typeof module !== 'undefined' && module.exports) {
+    return require('path').resolve(__dirname);
   }
   throw new Error('getAbsoluteFSPath can only be called within a Nodejs environment');
-}
+};
 
 const serve = [initFn, assetMiddleware()];
 
 function initFn(req, res, next) {
   if (req.url === '/queue-ui-init.js') {
-    res.set('Content-Type', 'application/javascript')
-    res.send(queueInit)
+    res.set('Content-Type', 'application/javascript');
+    res.send(queueInit);
   } else {
-    next()
+    next();
   }
 }
 
-const stringify = function(obj, isData) {
+const stringify = function (obj, isData) {
   const placeholder = '____CONTENTPLACEHOLDER____';
   let arr = [];
-  let json = JSON.stringify(obj, function(key, value) {
-    if (typeof value === 'function') {
-      arr.push(value);
-      return placeholder;
-    }
-    return value;
-  }, 2);
-  json = json.replace(new RegExp('"' + placeholder + '"', 'g'), function(_) {
+  let json = JSON.stringify(
+    obj,
+    function (key, value) {
+      if (typeof value === 'function') {
+        arr.push(value);
+        return placeholder;
+      }
+      return value;
+    },
+    2
+  );
+  json = json.replace(new RegExp('"' + placeholder + '"', 'g'), function (_) {
+    console.log(_);
     return arr.shift();
   });
   if (isData) {
@@ -107,16 +108,16 @@ const stringify = function(obj, isData) {
   return 'var options = ' + json + ';';
 };
 
-let queueData =  async function(config) {
+let queueData = async function (config) {
   if (config && typeof config === 'object' && Array.isArray(config.queues)) {
     const queue = new Queue(config);
-    const results =  await queue.queueStats(config.queues);
+    const results = await queue.queueStats(config.queues);
 
     return results;
   }
 
   throw new Error("the 'queues' field cannot be missing or undefined");
-}
+};
 
 let htmlTplStr = `
 <!-- HTML for static distribution bundle build -->
@@ -199,8 +200,7 @@ let htmlTplStr = `
 </script>
 </body>
 </html>
-`
-
+`;
 
 let jsTplStr = `
 window.onload = data => {
@@ -234,9 +234,9 @@ window.onload = data => {
     /* THIS IS TEST DATA */
 
      // dataObj[0].num = 70
-    // dataObj[1].num = 23
-    // dataObj[2].num = 2
-    // dataObj[3].num = 1
+    dataObj[1].num = 23
+    dataObj[2].num = 2
+    dataObj[3].num = 1
 
     //dataObj.push({
     //   queue: 'foo',
@@ -492,12 +492,10 @@ window.onload = data => {
       .text('a simple tooltip');
   }
 }
-`
-
-
+`;
 
 module.exports = {
   setup: setup,
   serve: serve,
-  queueData: queueData,
-}
+  queueData: queueData
+};

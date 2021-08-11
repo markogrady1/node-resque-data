@@ -116,4 +116,26 @@ const custumCss = `
 app.use('/queue-up', queue.serve, queue.setup(queueUiConfig, {}, custumCss));
 ```
 
+### Run tests
+
+```
+npm run test
+```
+
+### Run eslint
+
+display linting warnings and errors
+
+```
+npm run lint
+```
+
+fix linting warnings and errors
+
+```
+npm run lint:fix
+```
+
+
+
 
