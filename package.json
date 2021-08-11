@@ -1,11 +1,11 @@
 {
   "name": "@mytest/queue-up",
   "version": "1.0.0",
-  "description": "queueing system for NodeJS",
+  "description": "extract node-resque data",
   "main": "src/index.js",
   "scripts": {
     "dev": "node src/index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest"
   },
   "keywords": [
     "queue",
@@ -16,5 +16,9 @@
   "dependencies": {
     "express": "^4.17.1",
     "ioredis": "^4.27.6"
+  },
+  "devDependencies": {
+    "ioredis-mock": "^5.6.0",
+    "jest": "^27.0.6"
   }
 }
