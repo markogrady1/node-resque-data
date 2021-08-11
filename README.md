@@ -105,14 +105,14 @@ Custom CSS can be added by passing a third parameter into the `setup` function.
 This will allow you to totally change the look and feel of the UI
 
 ```javascript
-const custumCss = `
+const customCss = `
   body {
     color: red;
     font-size: 100px;
   };
 `;
 
-app.use('/queue-up', queue.serve, queue.setup(queueUiConfig, {}, custumCss));
+app.use('/queue-up', queue.serve, queue.setup(queueUiConfig, {}, customCss));
 ```
 
 ### Run tests
