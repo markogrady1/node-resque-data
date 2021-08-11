@@ -70,7 +70,7 @@ const config = {
 };
 
 // use with express middleware `use` function
-app.use('/some-route', queue.serve, queue.setup(config), {rawJSON: true});
+app.use('/some-route', queue.serve, queue.setup(config, {rawJSON: true}));
 ```
 
 ### Visualise node-resque data
