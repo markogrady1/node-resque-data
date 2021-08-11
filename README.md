@@ -116,3 +116,4 @@ const custumCss = `
 app.use('/queue-up', queue.serve, queue.setup(queueUiConfig, {}, custumCss));
 ```
 
+
