@@ -16,7 +16,7 @@ npm install node-resque-data
 View raw queue information
 
 
-```
+```javascript
 const queue = require('node-resque-data')
 
 const config = {
@@ -37,20 +37,20 @@ Configuring the connection and queue names
 
 using async/await
 
-```
+```javascript
 const result = await queue.queueData(config);
 console.log(result)
 ```
 using .then to resolve the promise
 
-```
+```javascript
 queue.queueData(config).then((result) => {
   console.log(result)
 });
 ```
 example output
 
-```
+```javascript
 [
   { queue: 'nameOfQueue1', num: 1 },
   { queue: 'nameOfQueue2', num: 23 },
@@ -62,7 +62,7 @@ example output
 
 The below snippet will display the same example output displayed above but this time to an express route you specify.
 
-```
+```javascript
 const queue = require('node-resque-data')
 
 const config = {
@@ -83,8 +83,7 @@ This will display the node-resque queue data in a bar and pie chart.
 
 Custom settings can be added by passing a second parameter into the `setup` function.
 
-```
-
+```javascript
 const customConf = {
     customTitle: 'Your Custom title',
     customHeader: 'Your Custom header value',
@@ -105,7 +104,7 @@ Custom CSS can be added by passing a third parameter into the `setup` function.
 
 This will allow you to totally change the look and feel of the UI
 
-```
+```javascript
 const custumCss = `
   body {
     color: red;
