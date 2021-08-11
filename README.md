@@ -5,13 +5,13 @@ this module can be used to grab node-resque data such as queue lengths.
 
 It can also be used to visualise node-resque data via express middleware.
 
-####Installation
+### Installation
 
 ```
 npm install node-resque-data
 ```
 
-####Usage:
+### Usage:
 
 View raw queue information
 
@@ -23,7 +23,7 @@ const config = {
   queues: ['nameOfQueue1', 'nameOfQueue2', 'nameOfQueue3'],
 };
 ```
-###Config fields:
+### Config fields:
 
 Configuring the connection and queue names
 
@@ -73,7 +73,7 @@ const config = {
 app.use('/some-route', queue.serve, queue.setup(config), {rawJSON: true});
 ```
 
-###Visualise node-resque data
+### Visualise node-resque data
 
 To acheive this simply remove the `{rawJSON: true}` object from the `queue.setup` function or even set it to `false`
 
@@ -99,7 +99,7 @@ Custom settings fields:
 - **customTitle:** Allows you to customise the browser tab title
 - **customHeader:** Allows you to customise the text shown in the header
 
-###Custom Css
+### Custom Css
 
 Custom CSS can be added by passing a third parameter into the `setup` function.
 
