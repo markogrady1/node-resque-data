@@ -234,9 +234,9 @@ window.onload = data => {
     /* THIS IS TEST DATA */
 
      // dataObj[0].num = 70
-    dataObj[1].num = 23
-    dataObj[2].num = 2
-    dataObj[3].num = 1
+    // dataObj[1].num = 23
+    // dataObj[2].num = 2
+    // dataObj[3].num = 1
 
     //dataObj.push({
     //   queue: 'foo',
