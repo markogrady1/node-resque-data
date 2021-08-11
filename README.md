@@ -27,13 +27,13 @@ const config = {
 
 Configuring the connection and queue names
 
-- **queues:** Required field. An array of strings consisting of queue names
-- **namespace:** Optional field. Defaults to 'resque' if not included. Should be the same as the namespace used with node-resque
-- **host:** Optional field. Defaults to 'localhost' if not included.
-- **port:** Optional field. Defaults to '6379' if not included.
-- **password:** Optional field (if no password used)
-- **family:** Optional field. Accepted values 4 or 6 (IPv4 or IPv6 respectively)
-- **db:** Optional field. Redis DB number, i.e 0, 1, 2, etc..
+- `queues:` Required field. An array of strings consisting of queue names
+- `namespace:` Optional field. Defaults to 'resque' if not included. Should be the same as the namespace used with node-resque
+- `host:` Optional field. Defaults to 'localhost' if not included.
+- `port:` Optional field. Defaults to '6379' if not included.
+- `password:` Optional field (if no password used)
+- `family:` Optional field. Accepted values 4 or 6 (IPv4 or IPv6 respectively)
+- `db:` Optional field. Redis DB number, i.e 0, 1, 2, etc..
 
 using async/await
 
@@ -94,9 +94,9 @@ app.use('/some-route', queue.serve, queue.setup(config, customConf));
 
 Custom settings fields:
 
-- **rawJSON:** boolean field, that determines if the page displays a raw JSON display of queue lengths or a visual display.
-- **customTitle:** Allows you to customise the browser tab title
-- **customHeader:** Allows you to customise the text shown in the header
+- `rawJSON:` boolean field, that determines if the page displays a raw JSON display of queue lengths or a visual display.
+- `customTitle:` Allows you to customise the browser tab title
+- `customHeader:` Allows you to customise the text shown in the header
 
 ### Custom Css
 
