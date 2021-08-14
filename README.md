@@ -95,6 +95,7 @@ app.use('/some-route', queue.serve, queue.setup(config, customConf));
 Custom settings fields:
 
 - `rawJSON`: boolean field, that determines if the page displays a raw JSON display of queue lengths or a visual display.
+- `includeScheduledJobs`: boolean field, that determines if the output includes the number of sheduled delayed jobs.
 - `customTitle`: Allows you to customise the browser tab title
 - `customHeader`: Allows you to customise the text shown in the header
 
