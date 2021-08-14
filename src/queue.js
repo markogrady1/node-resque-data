@@ -1,36 +1,24 @@
-// import Job from './Job.js';
-const Redis = require('ioredis');
+const Connection = require('./redis');
 
-/*
-
-new Redis({
-  port: 6379, // Redis port
-  host: "127.0.0.1", // Redis host
-  family: 4, // 4 (IPv4) or 6 (IPv6)
-  password: "auth",
-  db: 0,
-});
-
-*/
 module.exports = class Queue {
   constructor(config = undefined) {
-    this.namespace = config.namespace || 'resque';
-    this.redis = new Redis(config);
+    this.store = new Connection(config);
   }
 
   async queueForUI(queues, fn) {
-    this._getQueueLengths(queues, fn);
+    this._getQueueLengths(fn);
   }
 
   async queueStats(queues) {
-    const queueData = await this._getQueueLengths(queues);
+    const queueData = await this._getQueueLengths();
     return queueData;
   }
 
-  async _getQueueLengths(queues, fn = undefined) {
+  async _getQueueLengths(fn = undefined) {
     let queueLen = [];
+    const queues = this.store.queues;
     for (const index in queues) {
-      const length = await this.redis.llen(`${this.namespace}:queue:${queues[index]}`);
+      const length = await this.store.redis.llen(`${this.namespace}:queue:${this.store.queues[index]}`);
       queueLen.push({
         queue: queues[index],
         num: length
