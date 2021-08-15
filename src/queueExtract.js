@@ -124,15 +124,18 @@ let queueData = async function (config) {
   throw new Error("the 'queues' field cannot be missing or undefined");
 };
 
-let scheduledData = function (config) {
+let scheduledData = function (config, opts = undefined, fn) {
+
+let scheduled;
   if (config && typeof config === 'object') {
-    const scheduled = new Scheduled(config);
+    if (opts && typeof opts === 'object') {
+      config.opts = opts;
+      scheduled = new Scheduled(config);
+    }
     scheduled.getScheduledJobs((data) => {
-      return data;
+      fn(data);
     });
   }
-
-  //throw new Error("config cannot be missing or undefined");
 };
 
 let htmlTplStr = `
