@@ -15,7 +15,6 @@ module.exports = class Queue {
 
   async _getQueueLengths(raw) {
     let queueLen = [];
-
     try {
       const queues = this.store.queues;
       for (const index in queues) {

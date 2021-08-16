@@ -195,6 +195,11 @@ let htmlTplStr = `
       background-color: #000;
     }
 
+    text.bar-label {
+      fill: black;
+      text-anchor: middle; /* horizontally centers */
+    }
+
   </style>
   <style>
     <% customCss %>
@@ -249,7 +254,7 @@ window.onload = data => {
     <% dataObj %>
     /* THIS IS TEST DATA */
 
-     // dataObj[0].num = 70
+    dataObj[0].num = 70
     dataObj[1].num = 23
     dataObj[2].num = 2
     dataObj[3].num = 1
@@ -346,10 +351,10 @@ window.onload = data => {
       .classed('bar-label', true)
 
       .attr('x', function(d, i) {
-        return x(i) + x.bandwidth() / 3;
+        return x(i) + x.bandwidth() / 2;
       })
       .attr('y', function(d, i) {
-        return y(d.num + 0.01);
+        return y(d.num + 0.99);
       })
       .text(function(d, i) {
         return d.num;
