@@ -5,29 +5,35 @@ module.exports = class Queue {
     this.store = new Connection(config);
   }
 
-  async queueForUI(queues, fn) {
-    this._getQueueLengths(fn);
+  async queueForUI() {
+    return await this._getQueueLengths();
   }
 
-  async queueStats(queues) {
-    const queueData = await this._getQueueLengths();
-    return queueData;
+  async queueStats() {
+    return await this._getQueueLengths(true);
   }
 
-  async _getQueueLengths(fn = undefined) {
+  async _getQueueLengths(raw) {
     let queueLen = [];
-    const queues = this.store.queues;
-    for (const index in queues) {
-      const length = await this.store.redis.llen(`${this.namespace}:queue:${this.store.queues[index]}`);
-      queueLen.push({
-        queue: queues[index],
-        num: length
-      });
-    }
-    if (!fn) {
-      return queueLen;
-    }
 
-    fn(queueLen);
+    try {
+      const queues = this.store.queues;
+      for (const index in queues) {
+        const length = await this.store.redis.llen(`${this.namespace}:queue:${this.store.queues[index]}`);
+        queueLen.push({
+          queue: queues[index],
+          num: length
+        });
+      }
+      if (raw) {
+        return queueLen;
+      }
+
+      return new Promise((resolve, reject) => {
+        resolve(queueLen);
+      });
+    } catch (err) {
+      reject(err);
+    }
   }
 };

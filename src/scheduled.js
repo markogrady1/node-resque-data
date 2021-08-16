@@ -6,26 +6,31 @@ module.exports = class Scheduled {
     this.store = new Connection(config);
   }
 
-  getScheduledJobs(fn) {
-    let keys = [];
+  getScheduledJobs() {
     // get all scheduled keys
-    this.store.redis.scanStream({
-      match: this.store.namespace + ':delayed:*',
-    }).on('data', data => {
-      keys = keys.concat(data);
-    }).on('end', async () => {
-      const queueData = {
-        scheduledJobs: keys.length,
-      };
+    return new Promise((resolve, reject) => {
+      const stream = this.store.redis.scanStream({
+        match: this.store.namespace + ':delayed:*'
+      });
+      let keys = [];
+      stream.on('data', data => {
+        keys = keys.concat(data);
+      });
+      stream.on('end', async () => {
+        const queueData = {
+          scheduledJobs: keys.length
+        };
 
-      if (this.config.opts.includeJobDetails) {
-        queueData.scheduledJobsDetails = [];
-        for (let i of keys) {
-          const jobs =  await this.getScheduledJobContent(i);
-          queueData.scheduledJobsDetails.push(jobs)
+        if (this.config.opts.includeJobDetails) {
+          queueData.scheduledJobsDetails = [];
+          for (let i of keys) {
+            const jobs = await this.getScheduledJobContent(i);
+            queueData.scheduledJobsDetails.push(jobs);
+          }
         }
-      }
-      fn(queueData);
+        resolve(queueData);
+      });
+      stream.on('error', error => reject(error));
     });
   }
 
@@ -35,4 +40,4 @@ module.exports = class Scheduled {
     sheduledJobContent.runTime = new Date(key.split(':')[2] * 1000);
     return sheduledJobContent;
   }
-}
+};

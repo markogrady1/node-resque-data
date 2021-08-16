@@ -22,5 +22,4 @@ module.exports = class Connect {
   // connection(config = undefined) {
 
   // }
-}
-
+};

@@ -5,14 +5,13 @@ const express = require('express');
 let queueInit;
 
 let generate = function (config, opts, _htmlTplString, _jsTplString, customCss, customJs) {
-
   const customCssStr = customCss ? customCss : '';
   const customJsStr = customJs ? customJs : '';
 
   if (config && typeof config === 'object') {
     config.namespace = config.namespace || 'resque';
     if (!config.queues) {
-      throw new Error("'queues' is a requried config field")
+      throw new Error("'queues' is a requried config field");
     }
   }
 
@@ -39,7 +38,7 @@ let generate = function (config, opts, _htmlTplString, _jsTplString, customCss, 
 };
 
 let setup = function (config, opts, customCss, customJs) {
-  return function (req, res) {
+  return async function (req, res) {
     config.uiUrl = req.originalUrl;
     const html = generate(config, opts, htmlTplStr, jsTplStr, customCss, customJs);
 
@@ -52,14 +51,13 @@ let setup = function (config, opts, customCss, customJs) {
       uiUrl: config.uiUrl
     };
     queueInit = jsTplStr.toString().replace('<% options %>', stringify(testOptions));
-    queue.queueForUI(config.queues, data => {
-      if (displayRaw) {
-        res.set('Content-Type', 'application/json');
-        return res.send(data);
-      }
-      queueInit = queueInit.toString().replace('<% dataObj %>', stringify(data, true));
-      res.send(html);
-    });
+    const data = await queue.queueForUI(config.queues);
+    if (displayRaw) {
+      res.set('Content-Type', 'application/json');
+      return res.send(data);
+    }
+    queueInit = queueInit.toString().replace('<% dataObj %>', stringify(data, true));
+    res.send(html);
   };
 };
 
@@ -124,17 +122,16 @@ let queueData = async function (config) {
   throw new Error("the 'queues' field cannot be missing or undefined");
 };
 
-let scheduledData = function (config, opts = undefined, fn) {
-
-let scheduled;
+let scheduledData = async function (config, opts = undefined) {
+  let scheduled;
   if (config && typeof config === 'object') {
     if (opts && typeof opts === 'object') {
       config.opts = opts;
       scheduled = new Scheduled(config);
     }
-    scheduled.getScheduledJobs((data) => {
-      fn(data);
-    });
+    const dataResult = await scheduled.getScheduledJobs();
+
+    return dataResult;
   }
 };
 
@@ -517,5 +514,5 @@ module.exports = {
   setup: setup,
   serve: serve,
   queueData: queueData,
-  scheduledData: scheduledData,
+  scheduledData: scheduledData
 };
