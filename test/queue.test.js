@@ -11,9 +11,9 @@ beforeEach(() => {
 describe('test Queue Class', function () {
   test('test queue attributes', async () => {
     // config contents
-    expect(queue.namespace).toEqual('my-test-namespace');
+    expect(queue.store.namespace).toEqual('my-test-namespace');
     // redis contents
-    expect(queue.redis).toEqual(
+    expect(queue.store.redis).toEqual(
       expect.objectContaining({
         _events: {},
         customCommands: {}
@@ -21,24 +21,23 @@ describe('test Queue Class', function () {
     );
   });
   test('test queueStats', async () => {
-    const result = await queue.queueStats(_setupQueueConfig().queues);
+    const result = await queue.queueStats();
     expect(result).toEqual(_getQueueResult());
   });
 
   test('test queueForUI', async () => {
-    const fn = data => expect(data).toEqual(_getQueueResult());
-
-    const result = await queue.queueForUI(_setupQueueConfig().queues, fn);
+    const result = await queue.queueForUI();
+    expect(result).toEqual(_getQueueResult());
   });
 
   test('test _getQueueLengths', async () => {
-    const result = await queue._getQueueLengths(_setupQueueConfig().queues);
+    const result = await queue._getQueueLengths();
     expect(result).toEqual(_getQueueResult());
   });
 
   test('test _getQueueLengths with callback', async () => {
-    const fn = data => expect(data).toEqual(_getQueueResult());
-    const resultCallback = await queue._getQueueLengths(_setupQueueConfig().queues, fn);
+    const resultCallback = await queue._getQueueLengths();
+    expect(resultCallback).toEqual(_getQueueResult());
   });
 });
 
