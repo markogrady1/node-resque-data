@@ -1,7 +1,7 @@
 # node-resque-data
 
 
-this module can be used to grab node-resque data such as queue lengths.
+this module can be used to grab node-resque data such as queue lengths and the number of scheduled jobs outstanding.
 
 It can also be used to visualise node-resque data via express middleware.
 
@@ -20,34 +20,19 @@ View raw queue information
 const queue = require('node-resque-data')
 
 const config = {
+  port: 6379, // Optional - defaults to 6379
+  host: 'localhost', // Optional - defaults to 'localhost'
+  password: "redis-pw",
+  db: 0, // Optional - defaults to 0
+  family: 4, // Optional - defaults to 4 for IPv4 or 6 for IPv6
   queues: ['nameOfQueue1', 'nameOfQueue2', 'nameOfQueue3'],
+  namespace: 'beepbop', // Optional - defaults to 'resque'
 };
-```
-### Config fields:
 
-Configuring the connection and queue names
-
-- `queues`: Required field. An array of strings consisting of queue names
-- `namespace`: Optional field. Defaults to 'resque' if not included. Should be the same as the namespace used with node-resque
-- `host`: Optional field. Defaults to 'localhost' if not included.
-- `port`: Optional field. Defaults to '6379' if not included.
-- `password`: Optional field (if no password used)
-- `family`: Optional field. Accepted values 4 or 6 (IPv4 or IPv6 respectively)
-- `db`: Optional field. Redis DB number, i.e 0, 1, 2, etc..
-
-using async/await
-
-```javascript
 const result = await queue.queueData(config);
 console.log(result)
 ```
-using .then to resolve the promise
 
-```javascript
-queue.queueData(config).then((result) => {
-  console.log(result)
-});
-```
 example output
 
 ```javascript
@@ -58,7 +43,55 @@ example output
 ]
 ```
 
-### using node-resque-data with express middleware
+view queue information using `.then`
+
+```javascript
+queue.queueData(config).then((result) => {
+  console.log(result)
+});
+```
+
+view schedule information
+
+```javascript
+const result = await Queue.scheduledData(config);
+console.log(result)
+```
+Example output:
+
+```javascript
+{
+  scheduledJobs: 2
+}
+```
+include more information about the scheduled jobs
+
+```javascript
+const options = {
+  includeJobDetails: true
+};
+
+const result = await Queue.scheduledData(config, options);
+console.log(result)
+```
+Example output:
+
+```javascript
+{
+  scheduledJobs: 2,
+  scheduledJobsDetails: [
+    {
+      class: 'subtract',
+      queue: 'math',
+      args: [ 2, 1 ],
+      runTime: 2021-08-15T19:36:27.000Z
+   }
+  ]
+}
+```
+
+
+### integrate node-resque-data with express middleware
 
 The below snippet will display the same example output displayed above but this time to an express route you specify.
 
@@ -69,8 +102,12 @@ const config = {
   queues: ['nameOfQueue1', 'nameOfQueue2', 'nameOfQueue3'],
 };
 
-// use with express middleware `use` function
-app.use('/some-route', queue.serve, queue.setup(config, {rawJSON: true}));
+const options = {
+  rawJSON: true
+};
+
+// add route via express middleware
+app.use('/some-route', queue.serve, queue.setup(config, options));
 ```
 
 ### Visualise node-resque data
@@ -79,23 +116,22 @@ To acheive this simply remove the `{rawJSON: true}` object from the `queue.setup
 
 This will display the node-resque queue data in a bar and pie chart.
 
-### Custom settings:
+### Custom options:
 
 Custom settings can be added by passing a second parameter into the `setup` function.
 
 ```javascript
-const customConf = {
+const options = {
     customTitle: 'Your Custom title',
     customHeader: 'Your Custom header value',
 };
 
-app.use('/some-route', queue.serve, queue.setup(config, customConf));
+app.use('/some-route', queue.serve, queue.setup(config, options));
 ```
 
-Custom settings fields:
+Custom option fields:
 
 - `rawJSON`: boolean field, that determines if the page displays a raw JSON display of queue lengths or a visual display.
-- `includeScheduledJobs`: boolean field, that determines if the output includes the number of sheduled delayed jobs.
 - `customTitle`: Allows you to customise the browser tab title
 - `customHeader`: Allows you to customise the text shown in the header
 
@@ -135,7 +171,3 @@ fix linting warnings and errors
 ```
 npm run lint:fix
 ```
-
-
-
-

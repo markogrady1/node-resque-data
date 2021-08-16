@@ -10,8 +10,12 @@
     "lint:fix": "npm run lint -- --fix"
   },
   "keywords": [
-    "queue",
-    "redis"
+    "node-resque",
+    "node-resque-data",
+    "resque",
+    "redis",
+    "ioredis",
+    "node-resque-data"
   ],
   "author": "Mark O Grady",
   "license": "ISC",
