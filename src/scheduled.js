@@ -21,7 +21,7 @@ module.exports = class Scheduled {
           scheduledJobs: keys.length
         };
 
-        if (this.config.opts.includeJobDetails) {
+        if (this.config?.opts?.includeJobDetails) {
           queueData.scheduledJobsDetails = [];
           for (let i of keys) {
             const jobs = await this.getScheduledJobContent(i);
