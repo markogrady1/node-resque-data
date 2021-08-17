@@ -118,12 +118,13 @@ This will display the node-resque queue data in a bar and pie chart.
 
 ### Custom options:
 
-Custom settings can be added by passing a second parameter into the `setup` function.
+Custom settings can be added by passing additional keys into the `options` object.
 
 ```javascript
 const options = {
-    customTitle: 'Your Custom title',
-    customHeader: 'Your Custom header value',
+  rawJSON: false,
+  customTitle: 'Your Custom title',
+  customHeader: 'Your Custom header value',
 };
 
 app.use('/some-route', queue.serve, queue.setup(config, options));
