@@ -127,8 +127,8 @@ let scheduledData = async function (config, opts = undefined) {
   if (config && typeof config === 'object') {
     if (opts && typeof opts === 'object') {
       config.opts = opts;
-      scheduled = new Scheduled(config);
     }
+    const scheduled = new Scheduled(config);
     const dataResult = await scheduled.getScheduledJobs();
 
     return dataResult;
