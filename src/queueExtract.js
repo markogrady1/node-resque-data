@@ -252,36 +252,6 @@ window.onload = data => {
   {
 
     <% dataObj %>
-    /* THIS IS TEST DATA */
-
-    dataObj[0].num = 70
-    dataObj[1].num = 23
-    dataObj[2].num = 2
-    dataObj[3].num = 1
-
-    //dataObj.push({
-    //   queue: 'foo',
-    //   num: 1230
-    //},{
-    //  queue: 'foo1',
-    //  num: 123
-    //},{
-    //  queue: 'foo2',
-    //  num: 235
-    //},{
-    //  queue: 'foo3',
-    //  num: 6342
-    // },{
-    //   queue: 'foo4',
-    //   num: 6243
-    // },{
-    //   queue: 'foo5',
-    //   num: 563
-    //  },{
-    //    queue: 'foo6',
-    //    num: 23
-    //}
-    //)
 
   } {
     const width = 1550;
