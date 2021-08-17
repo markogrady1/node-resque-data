@@ -3,6 +3,10 @@
   "version": "0.0.1",
   "description": "extract node-resque data",
   "main": "src/index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/markogrady1/node-resque-data.git"
+  },
   "scripts": {
     "dev": "node src/index.js",
     "test": "jest",
