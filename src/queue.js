@@ -18,7 +18,7 @@ module.exports = class Queue {
     try {
       const queues = this.store.queues;
       for (const index in queues) {
-        const length = await this.store.redis.llen(`${this.namespace}:queue:${this.store.queues[index]}`);
+        const length = await this.store.redis.llen(`${this.store.namespace}:queue:${this.store.queues[index]}`);
         queueLen.push({
           queue: queues[index],
           num: length
