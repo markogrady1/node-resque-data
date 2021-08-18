@@ -17,7 +17,7 @@ View raw queue information
 
 
 ```javascript
-const queue = require('node-resque-data')
+const {Queue} = require('node-resque-data')
 
 const config = {
   port: 6379, // Optional - defaults to 6379
@@ -29,7 +29,7 @@ const config = {
   namespace: 'beepbop', // Optional - defaults to 'resque'
 };
 
-const result = await queue.queueData(config);
+const result = await Queue.queueData(config);
 console.log(result)
 ```
 
@@ -46,7 +46,7 @@ example output
 view queue information using `.then`
 
 ```javascript
-queue.queueData(config).then((result) => {
+Queue.queueData(config).then((result) => {
   console.log(result)
 });
 ```
@@ -96,7 +96,7 @@ Example output:
 The below snippet will display the same example output displayed above but this time to an express route you specify.
 
 ```javascript
-const queue = require('node-resque-data')
+const {Queue} = require('node-resque-data')
 
 const config = {
   queues: ['nameOfQueue1', 'nameOfQueue2', 'nameOfQueue3'],
@@ -107,7 +107,7 @@ const options = {
 };
 
 // add route via express middleware
-app.use('/some-route', queue.serve, queue.setup(config, options));
+app.use('/some-route', Queue.serve, Queue.setup(config, options));
 ```
 
 ### Visualise node-resque data
@@ -127,7 +127,7 @@ const options = {
   customHeader: 'Your Custom header value',
 };
 
-app.use('/some-route', queue.serve, queue.setup(config, options));
+app.use('/some-route', Queue.serve, Queue.setup(config, options));
 ```
 
 Custom option fields:
@@ -150,7 +150,7 @@ const customCss = `
   };
 `;
 
-app.use('/queue-up', queue.serve, queue.setup(queueUiConfig, {}, customCss));
+app.use('/queue-up', Queue.serve, Queue.setup(queueUiConfig, {}, customCss));
 ```
 
 ### Run tests
