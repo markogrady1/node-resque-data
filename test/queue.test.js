@@ -16,7 +16,8 @@ describe('test Queue Class', function () {
     expect(queue.store.redis).toEqual(
       expect.objectContaining({
         _events: {},
-        customCommands: {}
+        customCommands: {},
+        connected: true
       })
     );
   });
