@@ -146,7 +146,7 @@ This will allow you to totally change the look and feel of the UI
 const customCss = `
   body {
     color: red;
-    font-size: 100px;
+    font-size: 8px;
   };
 `;
 
