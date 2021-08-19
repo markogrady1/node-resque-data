@@ -7,7 +7,7 @@ It can also be used to visualise node-resque data via express middleware.
 
 ### Installation
 
-```
+```bash
 npm install node-resque-data
 ```
 

@@ -1,6 +1,6 @@
 {
   "name": "node-resque-data",
-  "version": "0.0.12",
+  "version": "0.0.13",
   "description": "extract node-resque data",
   "main": "src/index.js",
   "repository": {
