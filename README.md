@@ -152,7 +152,7 @@ const customCss = `
   };
 `;
 
-app.use('/queue-up', Queue.serve, Queue.setup(queueUiConfig, {}, customCss));
+app.use('/some-route', Queue.serve, Queue.setup(queueUiConfig, options, customCss));
 ```
 
 ### Run tests
