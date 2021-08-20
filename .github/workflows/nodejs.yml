@@ -14,6 +14,7 @@ jobs:
         - Node.js 10.x
         - Node.js 11.x
         - Node.js 12.x
+        - Node.js 14.x
 
         include:
         - name: Node.js 10.x
@@ -30,6 +31,9 @@ jobs:
           node-version: "12.22"
           npm-i: jest@27.0.6  supertest@3.4.2
 
+        - name: Node.js 14.x
+          node-version: "12.17"
+          npm-i: jest@27.0.6  supertest@3.4.2
 
     steps:
     - uses: actions/checkout@v2
