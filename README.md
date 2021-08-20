@@ -1,7 +1,7 @@
 # node-resque-data
 
 
-[![NPM Version][npm-image]][npm-url]<!-- to be used when/if numbers are respectable [![NPM Downloads][downloads-image]][downloads-url]-->[![Linux Build][ci-image]][ci-url]
+[![NPM Version][npm-image]][npm-url]<!-- to be used when/if numbers are respectable [![NPM Downloads][downloads-image]][downloads-url]--> [![Linux Build][ci-image]][ci-url]
 
 This package can be used to grab node-resque data such as queue lengths and the number of scheduled jobs outstanding.
 
