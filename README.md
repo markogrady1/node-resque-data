@@ -1,7 +1,11 @@
 # node-resque-data
 
 
-this module can be used to grab node-resque data such as queue lengths and the number of scheduled jobs outstanding.
+[![NPM Version][npm-image]][npm-url]
+<!-- to be used when/if numbers are respectable [![NPM Downloads][downloads-image]][downloads-url]-->
+[![Linux Build][ci-image]][ci-url]
+
+This package can be used to grab node-resque data such as queue lengths and the number of scheduled jobs outstanding.
 
 It can also be used to visualise node-resque data via express middleware.
 
@@ -172,3 +176,10 @@ fix linting warnings and errors
 ```
 npm run lint:fix
 ```
+
+[ci-image]: https://img.shields.io/github/workflow/status/markogrady1/node-resque-data/nodejs/master.svg?label=build
+[ci-url]: https://github.com/markogrady1/node-resque-data/actions?query=workflow%3Anodejs
+[npm-image]: https://img.shields.io/npm/v/node-resque-data.svg
+[npm-url]: https://npmjs.org/package/node-resque-data
+[downloads-image]: https://img.shields.io/npm/dm/node-resque-data.svg
+[downloads-url]: https://npmcharts.com/compare/node-resque-data?minimal=true
