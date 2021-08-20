@@ -1,0 +1,75 @@
+name: nodejs
+
+on:
+- pull_request
+- push
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        name:
+        - Node.js 8.x
+        - Node.js 9.x
+        - Node.js 10.x
+        - Node.js 11.x
+        - Node.js 12.x
+
+        include:
+        - name: Node.js 8.x
+          node-version: "8.17"
+          npm-i: mocha@7.2.0  supertest@3.4.2
+
+        - name: Node.js 9.x
+          node-version: "9.11"
+          npm-i: mocha@7.2.0  supertest@3.4.2
+
+        - name: Node.js 10.x
+          node-version: "10.24"
+          npm-i: mocha@7.2.0  supertest@3.4.2
+
+
+        - name: Node.js 11.x
+          node-version: "11.15"
+          npm-i: mocha@7.2.0  supertest@3.4.2
+
+
+        - name: Node.js 12.x
+          node-version: "12.22"
+          npm-i: mocha@7.2.0  supertest@3.4.2
+
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install Node.js ${{ matrix.node-version }}
+      shell: bash -eo pipefail -l {0}
+      run: |
+        nvm install --default ${{ matrix.node-version }}
+        dirname "$(nvm which ${{ matrix.node-version }})" >> "$GITHUB_PATH"
+    - name: Configure npm
+      run: |
+        npm config set loglevel error
+        npm config set shrinkwrap false
+    - name: Install npm module(s) ${{ matrix.npm-i }}
+      run: npm install --save-dev ${{ matrix.npm-i }}
+      if: matrix.npm-i != ''
+
+    - name: Remove non-test dependencies
+      run: npm rm --silent --save-dev connect-redis
+
+    - name: Install Node.js dependencies
+      run: npm install
+
+    - name: List environment
+      id: list_env
+      shell: bash
+      run: |
+        echo "node@$(node -v)"
+        echo "npm@$(npm -v)"
+        npm -s ls ||:
+    - name: Run tests
+      shell: bash
+      run: npm run test
