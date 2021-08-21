@@ -2,7 +2,6 @@ const {Queue, Scheduled} = require('../src/index');
 
 const request = require('supertest');
 const express = require('express');
-const app = express();
 
 jest.mock('ioredis', () => require('ioredis-mock/jest'));
 
@@ -10,9 +9,10 @@ const config = {
   queues: ['beepbop', 'robot']
 }
 
-app.use('/', Queue.serve, Queue.setup(config, {rawJSON: true}));
-
 test('middleware raw route works', done => {
+  const app = express();
+  app.use('/', Queue.serve, Queue.setup(config, {rawJSON: true}));
+
   request(app)
     .get('/')
     .expect('Content-Type', 'application/json; charset=utf-8')

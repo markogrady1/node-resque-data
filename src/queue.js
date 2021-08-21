@@ -27,12 +27,13 @@ module.exports = class Queue {
       if (raw) {
         return queueLen;
       }
-
+      let rejection;
       return new Promise((resolve, reject) => {
         resolve(queueLen);
-      });
-    } catch (err) {
-      reject(err);
+        rejection = reject;
+      }).catch(err => rejection(err));
+    } catch (error) {
+      throw new Error(error);
     }
   }
 };

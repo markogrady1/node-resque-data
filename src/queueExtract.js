@@ -8,15 +8,14 @@ let generate = function (config, opts, _htmlTplString, _jsTplString, customCss, 
   const customCssStr = customCss ? customCss : '';
   const customJsStr = customJs ? customJs : '';
 
-  if (config && typeof config === 'object') {
-    config.namespace = config.namespace || 'resque';
-    if (!config.queues) {
-      throw new Error("'queues' is a requried config field");
-    }
+  if (!correctConfig(config)) {
+    throw new Error("a config containing a 'queues' array is required");
   }
 
-  let pageHeader = 'Node Resque UI';
-  let pageTitle = 'Node Resque UI';
+  config.namespace = config.namespace || 'resque';
+
+  let pageHeader = 'Node Resque Data';
+  let pageTitle = 'Node Resque Data';
   let rawJSON = false;
   if (opts && typeof opts === 'object') {
     rawJSON = opts.rawJSON || rawJSON;
@@ -38,6 +37,10 @@ let generate = function (config, opts, _htmlTplString, _jsTplString, customCss, 
 };
 
 let setup = function (config, opts, customCss, customJs) {
+  if (!config && typeof config !== 'object') {
+    throw new Error('config is required');
+  }
+
   return async function (req, res) {
     config.uiUrl = req.originalUrl;
     const html = generate(config, opts, htmlTplStr, jsTplStr, customCss, customJs);
@@ -112,18 +115,17 @@ const stringify = function (obj, isData) {
 };
 
 let queueData = async function (config) {
-  if (config && typeof config === 'object' && Array.isArray(config.queues)) {
+  if (correctConfig(config)) {
     const queue = new Queue(config);
     const results = await queue.queueStats(config.queues);
 
     return results;
   }
 
-  throw new Error("the 'queues' field cannot be missing or undefined");
+  throw new Error("a config containing a 'queues' array is required");
 };
 
 let scheduledData = async function (config, opts = undefined) {
-  let scheduled;
   if (config && typeof config === 'object') {
     if (opts && typeof opts === 'object') {
       config.opts = opts;
@@ -132,6 +134,15 @@ let scheduledData = async function (config, opts = undefined) {
     const dataResult = await scheduled.getScheduledJobs();
 
     return dataResult;
+  }
+  throw new Error('config is required');
+};
+
+const correctConfig = function (config) {
+  if (config && typeof config === 'object' && Array.isArray(config.queues)) {
+    return true;
+  } else {
+    return false;
   }
 };
 

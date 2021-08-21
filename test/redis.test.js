@@ -8,6 +8,10 @@ beforeEach(() => {
   connection = new Connect(_setupQueueConfig());
 });
 
+afterEach(() => {
+  connection = undefined;
+});
+
 describe('test Connect Class', function () {
   test('test namespace attributes', async () => {
     expect(connection.namespace).toEqual('my-test-namespace');

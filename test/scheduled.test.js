@@ -2,18 +2,21 @@ const Scheduled = require('../src/scheduled');
 
 jest.mock('ioredis', () => require('ioredis-mock/jest'));
 
-let queue;
-
+let sched;
 beforeEach(() => {
-  queue = new Scheduled(_setupQueueConfig());
+  sched = new Scheduled(_setupQueueConfig());
+});
+
+afterEach(() => {
+  sched = undefined;
 });
 
 describe('test Scheduled Class', function () {
   test('test scheduled attributes', async () => {
     // config contents
-    expect(queue.store.namespace).toEqual('my-test-namespace');
+    expect(sched.store.namespace).toEqual('my-test-namespace');
     // redis contents
-    expect(queue.store.redis).toEqual(
+    expect(sched.store.redis).toEqual(
       expect.objectContaining({
         _events: {},
         customCommands: {},
@@ -22,13 +25,13 @@ describe('test Scheduled Class', function () {
     );
   });
   test('test getScheduledJobs', async () => {
-    const result = await queue.getScheduledJobs();
+    const result = await sched.getScheduledJobs();
     expect(result).toEqual({scheduledJobs: 0});
   });
 
   test('test getScheduledJobs with extra details', async () => {
-    queue.includeJobDetails = true;
-    const result = await queue.getScheduledJobs();
+    sched.includeJobDetails = true;
+    const result = await sched.getScheduledJobs();
     expect(result).toEqual({scheduledJobs: 0});
   });
 });

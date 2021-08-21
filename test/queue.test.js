@@ -8,6 +8,10 @@ beforeEach(() => {
   queue = new Queue(_setupQueueConfig());
 });
 
+afterEach(() => {
+  queue = undefined;
+});
+
 describe('test Queue Class', function () {
   test('test queue attributes', async () => {
     // config contents
