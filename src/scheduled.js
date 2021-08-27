@@ -1,9 +1,9 @@
 const Connection = require('./redis');
 
 module.exports = class Scheduled {
-  constructor(config = undefined) {
+  constructor(config = undefined, store) {
     this.config = config;
-    this.store = new Connection(config);
+    this.store = store || new Connection(config)
   }
 
   getScheduledJobs() {

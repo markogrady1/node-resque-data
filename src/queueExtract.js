@@ -1,5 +1,7 @@
-const Queue = require('./queue.js');
-const Scheduled = require('./scheduled.js');
+const Queue = require('./queue');
+const Job = require('./job');
+const Connection = require('./redis');
+const Scheduled = require('./scheduled');
 const express = require('express');
 
 let queueInit;
@@ -49,12 +51,19 @@ let setup = function (config, opts, customCss, customJs) {
     if (html && typeof html === 'boolean' && typeof html !== 'string') {
       displayRaw = true;
     }
+    const job = new Job(config);
     const queue = new Queue(config);
     const testOptions = {
       uiUrl: config.uiUrl
     };
     queueInit = jsTplStr.toString().replace('<% options %>', stringify(testOptions));
-    const data = await queue.queueForUI(config.queues);
+    const queueData = await queue.queueForUI(config.queues);
+    const jobData = await job.jobsForUI(config.queues);
+    const data = {
+      queues: queueData,
+      jobs: jobData,
+    }
+
     if (displayRaw) {
       res.set('Content-Type', 'application/json');
       return res.send(data);
@@ -116,10 +125,16 @@ const stringify = function (obj, isData) {
 
 let queueData = async function (config) {
   if (correctConfig(config)) {
-    const queue = new Queue(config);
-    const results = await queue.queueStats(config.queues);
+    const connection = new Connection(config);
+    const queue = new Queue(config, connection);
+    const job = new Job(config, connection);
+    const queueData = await queue.queueStats();
+    const jobData = await job.jobStats();
 
-    return results;
+    return {
+      queues: queueData,
+      jobs: jobData,
+    }
   }
 
   throw new Error("a config containing a 'queues' array is required");
@@ -130,7 +145,8 @@ let scheduledData = async function (config, opts = undefined) {
     if (opts && typeof opts === 'object') {
       config.opts = opts;
     }
-    const scheduled = new Scheduled(config);
+    const connection = new Connection(config);
+    const scheduled = new Scheduled(config, connection);
     const dataResult = await scheduled.getScheduledJobs();
 
     return dataResult;
@@ -281,12 +297,12 @@ window.onload = data => {
       .attr("viewBox", [0, 0, width, height]);
 
     const x = d3.scaleBand()
-      .domain(d3.range(dataObj.length))
+      .domain(d3.range(dataObj.queues.length))
       .range([margin.left, width - margin.right])
       .padding(0.1)
 
     const y = d3.scaleLinear()
-      .domain([0, d3.max(dataObj, function(d, i) {
+      .domain([0, d3.max(dataObj.queues, function(d, i) {
         return d.num;
       })])
       .range([height - margin.bottom, margin.top])
@@ -295,7 +311,7 @@ window.onload = data => {
       .append("g")
       .attr("fill", 'steelblue')
       .selectAll("rect")
-      .data(dataObj.sort((a, b) => d3.descending(a.num, b.num)))
+      .data(dataObj.queues.sort((a, b) => d3.descending(a.num, b.num)))
       .attr('transform', 'translate(' + 100 + ',' + 100 + ')')
       .join("rect")
       .attr("x", (d, i) => x(i))
@@ -326,7 +342,7 @@ window.onload = data => {
     const tooltip = tip('div.queue-table')
 
     svg.selectAll('.bar-label')
-      .data(dataObj)
+      .data(dataObj.queues)
       .enter()
       .append('text')
       .classed('bar-label', true)
@@ -389,7 +405,7 @@ window.onload = data => {
     const translateValue = height - margin.bottom;
     svg.append('g')
       .attr("transform", 'translate(0,' + translateValue + ')') // This controls the rotate position of the Axis
-      .call(d3.axisBottom(x).tickFormat(i => dataObj[i].queue))
+      .call(d3.axisBottom(x).tickFormat(i => dataObj.queues[i].queue))
       .selectAll("text")
       .attr("transform", "translate(-10,10)rotate(-45)")
       .style("text-anchor", "end")
@@ -401,9 +417,9 @@ window.onload = data => {
     const listEl = document.getElementById('queue-list');
     const node = document.createElement('ul'); // Create a <li> node
     listEl.appendChild(node);
-    for (let item in dataObj) {
+    for (let item in dataObj.queues) {
       const li = document.createElement('li');
-      const queueName = document.createTextNode(dataObj[item].queue + ': ' + dataObj[item].num);
+      const queueName = document.createTextNode(dataObj.queues[item].queue + ': ' + dataObj.queues[item].num);
       li.appendChild(queueName)
       node.appendChild(li)
 
@@ -427,13 +443,13 @@ window.onload = data => {
       .append("svg")
       .attr("width", width)
       .attr("height", height)
-      .data(dataObj.sort((a, b) => d3.descending(a.num, b.num)))
+      .data(dataObj.queues.sort((a, b) => d3.descending(a.num, b.num)))
       .append("g")
       .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")")
 
     // set the color scale
     const color = d3.scaleOrdinal()
-      .domain(dataObj)
+      .domain(dataObj.queues)
       .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"])
 
     // Compute the position of each group on the pie:
@@ -445,7 +461,7 @@ window.onload = data => {
     // Build the pie chart: Basically, each part of the pie is a path that we build using the arc function.
     const paths = svg
       .selectAll('svg')
-      .data(pie(dataObj))
+      .data(pie(dataObj.queues))
       .enter()
       .append('path')
       .attr('d', d3.arc()
@@ -464,7 +480,7 @@ window.onload = data => {
 
 
     d3.selectAll('.label')
-      .data(dataObj)
+      .data(dataObj.queues)
       .on("mouseover", function(d, i) {
         tooltip.html(
           '<div>Queue: ' + i.queue + '</div><div>Jobs: ' + i.num + '</div>'

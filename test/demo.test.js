@@ -39,13 +39,13 @@ describe('test Demo usage', function () {
   test('test getting queue data', async () => {
     const queueData = await Queue.queueData(_setupQueueConfig());
     const scheduledData = await Queue.scheduledData(_setupQueueConfig());
-    expect(queueData).toEqual(_getQueueResult());
-    expect(scheduledData).toEqual({'scheduledJobs': 0});
+    expect(queueData).toEqual({ queues: _getQueueResult(), jobs: _getJobResult() });
+        expect(scheduledData).toEqual({'scheduledJobs': 0});
   });
   test('test queueStats', async () => {
     const queueData = await Queue.queueData(_setupQueueConfig());
     const scheduledData = await Queue.scheduledData(_setupQueueConfig(), {includeJobDetails: true});
-    expect(queueData).toEqual(_getQueueResult());
+    expect(queueData).toEqual({ queues: _getQueueResult(), jobs: _getJobResult() });
     expect(scheduledData).toEqual({'scheduledJobs': 0, scheduledJobsDetails: []});
   });
 });
@@ -68,7 +68,12 @@ function _getQueueResult() {
       queue: 'queueFour',
       num: 0
     }
-  ];
+  ]
+};
+
+
+function _getJobResult() {
+  return {"failed": null, "failing": 0, "processed": null};
 }
 
 function _setupQueueConfig() {

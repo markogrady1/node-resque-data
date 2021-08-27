@@ -38,11 +38,14 @@ console.log(result)
 example output
 
 ```javascript
-[
-  { queue: 'nameOfQueue1', num: 1 },
-  { queue: 'nameOfQueue2', num: 23 },
-  { queue: 'nameOfQueue3', num: 0 },
-]
+{
+  queues: [
+    { queue: 'nameOfQueue1', num: 190 },
+    { queue: 'nameOfQueue2', num: 12 },
+    { queue: 'nameOfQueue3', num: 207 },
+  ],
+  jobs: { processed: '8302', failed: '12', failing: 0 }
+}
 ```
 
 view queue information using `.then`
@@ -84,7 +87,7 @@ Example output:
   scheduledJobsDetails: [
     {
       class: 'subtract',
-      queue: 'math',
+      queue: 'nameOfQueue1',
       args: [ 2, 1 ],
       runTime: 2021-08-15T19:36:27.000Z
    }

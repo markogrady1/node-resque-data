@@ -1,8 +1,8 @@
 const Connection = require('./redis');
 
 module.exports = class Queue {
-  constructor(config = undefined) {
-    this.store = new Connection(config);
+  constructor(config = undefined, store) {
+    this.store = store || new Connection(config)
   }
 
   async queueForUI() {
